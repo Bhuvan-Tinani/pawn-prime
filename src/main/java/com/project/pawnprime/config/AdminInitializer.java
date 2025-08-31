@@ -13,12 +13,12 @@ public class AdminInitializer {
     public CommandLineRunner initAdmin(AdminRepository adminRepository) {
         return args -> {
             // Check if admin already exists
-            if (adminRepository.findByUsername("admin").isEmpty()) {
+            if (adminRepository.count()==0) {
                 Admin admin = new Admin();
                 admin.setUsername("admin");
-                admin.setPassword("{noop}admin123"); // 🔹 store hashed password in real apps
+                admin.setPassword("admin123"); // 🔹 store hashed password in real apps
                 admin.setEmail("admin@pawnprime.com");
-                admin.setRole("ADMIN");
+                admin.setRole("ADMIN");	
                 admin.setActive(true);
 
                 adminRepository.save(admin);
