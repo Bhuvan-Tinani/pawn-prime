@@ -12,8 +12,8 @@ public class AdminInitializer {
     @Bean
     public CommandLineRunner initAdmin(AdminRepository adminRepository) {
         return args -> {
-            // Check if admin already exists
-            if (adminRepository.count()==0) {
+        	
+            if (adminRepository.findByUsername("admin")==null) {
                 Admin admin = new Admin();
                 admin.setUsername("admin");
                 admin.setPassword("admin123"); // 🔹 store hashed password in real apps
