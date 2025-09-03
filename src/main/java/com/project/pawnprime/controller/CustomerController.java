@@ -16,79 +16,75 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/customers")
-@PreAuthorize("hasRole('AGENT')")
 public class CustomerController {
 
-    private final CustomerService customerService;
-    private final AgentService agentService;
-    public CustomerController(CustomerService customerService,AgentService agentService) 
-    { 
-    	this.customerService = customerService; 
-    	this.agentService=agentService;
-    }
+	private final CustomerService customerService;
+	private final AgentService agentService;
 
-    // Create customer for a given agent (agentId in path; also allowed in body for clarity)
-    @PostMapping("/{agentId}")
-    public ResponseEntity<String> createCustomer(
-            @PathVariable Long agentId,
-            @RequestBody CustomerDTO customerDTO) {
+	public CustomerController(CustomerService customerService, AgentService agentService) {
+		this.customerService = customerService;
+		this.agentService = agentService;
+	}
 
-        // Ensure DTO agentId matches path agentId (if provided)
-        if (customerDTO.getAgentId() != null && !customerDTO.getAgentId().equals(agentId)) {
-            return ResponseEntity.badRequest().build();
-        }
+	// Create customer for a given agent (agentId in path; also allowed in body for
+	// clarity)
 
-        // Convert DTO -> Entity
-        Customer customer = CustomerMapper.toEntity(customerDTO);
+	@PreAuthorize("hasRole('AGENT')")
+	@PostMapping("/{agentId}")
+	public ResponseEntity<String> createCustomer(@PathVariable Long agentId, @RequestBody CustomerDTO customerDTO) {
 
-        // Save customer
-        
-        CustomerAddress cusAddr=new CustomerAddress();
-        cusAddr.setLine1(customerDTO.getAdrLine1());
-        cusAddr.setLine2(customerDTO.getAdrLine2());
-        cusAddr.setPincode(customerDTO.getPincode());
-        cusAddr.setCity(customerDTO.getCity());
-        cusAddr.setState(customerDTO.getState());
-        cusAddr.setCountry(customerDTO.getCountry());
-        cusAddr.setCustomer(customer);
-        List<CustomerAddress> cusAddres=new ArrayList<>();
-        cusAddres.add(cusAddr);
-        customer.setAddresses(cusAddres);
-        Customer saved = customerService.createCustomer(customer, agentId);
-        
-        // Return DTO instead of entity
-        return ResponseEntity.ok("Customer details created successfully!");
-    }
+		// Ensure DTO agentId matches path agentId (if provided)
+		if (customerDTO.getAgentId() != null && !customerDTO.getAgentId().equals(agentId)) {
+			return ResponseEntity.badRequest().build();
+		}
 
+		// Convert DTO -> Entity
+		Customer customer = CustomerMapper.toEntity(customerDTO);
 
-    @GetMapping
-    public ResponseEntity<List<CustomerDTO>> getAllCustomers() {
-        List<CustomerDTO> customers = customerService.getAllCustomers()
-                .stream()
-                .map(CustomerMapper::toDTO)
-                .toList();
-        return ResponseEntity.ok(customers);
-    }
-    
+		// Save customer
+
+		CustomerAddress cusAddr = new CustomerAddress();
+		cusAddr.setLine1(customerDTO.getAdrLine1());
+		cusAddr.setLine2(customerDTO.getAdrLine2());
+		cusAddr.setPincode(customerDTO.getPincode());
+		cusAddr.setCity(customerDTO.getCity());
+		cusAddr.setState(customerDTO.getState());
+		cusAddr.setCountry(customerDTO.getCountry());
+		cusAddr.setCustomer(customer);
+		List<CustomerAddress> cusAddres = new ArrayList<>();
+		cusAddres.add(cusAddr);
+		customer.setAddresses(cusAddres);
+		Customer saved = customerService.createCustomer(customer, agentId);
+
+		// Return DTO instead of entity
+		return ResponseEntity.ok("Customer details created successfully!");
+	}
+
+	@PreAuthorize("hasRole('AGENT','ADMIN')")
+	@GetMapping
+	public ResponseEntity<List<CustomerDTO>> getAllCustomers() {
+		List<CustomerDTO> customers = customerService.getAllCustomers().stream().map(CustomerMapper::toDTO).toList();
+		return ResponseEntity.ok(customers);
+	}
+
 //    @GetMapping
 //    public String getAllCustomers() {
 //        return "hello";
 //    }
 
-    @GetMapping("agent/{agentId}")
-    public ResponseEntity<List<CustomerDTO>> getCustomersByAgent(@PathVariable Long agentId) {
-        List<CustomerDTO> customers = customerService.getCustomersByAgent(agentId)
-                .stream()
-                .map(CustomerMapper::toDTO)
-                .toList();
-        return ResponseEntity.ok(customers);
-    }
-    
-    @GetMapping("/{customerId}")
-    public ResponseEntity<CustomerDTO> getCustomerById(@PathVariable Long customerId) {
-        Customer customer = customerService.getCustomerById(customerId);
-        return ResponseEntity.ok(CustomerMapper.toDTO(customer));
-    }
+	@PreAuthorize("hasRole('AGENT','ADMIN')")
+	@GetMapping("agent/{agentId}")
+	public ResponseEntity<List<CustomerDTO>> getCustomersByAgent(@PathVariable Long agentId) {
+		List<CustomerDTO> customers = customerService.getCustomersByAgent(agentId).stream().map(CustomerMapper::toDTO)
+				.toList();
+		return ResponseEntity.ok(customers);
+	}
 
+	@PreAuthorize("hasRole('AGENT','ADMIN')")
+	@GetMapping("/{customerId}")
+	public ResponseEntity<CustomerDTO> getCustomerById(@PathVariable Long customerId) {
+		Customer customer = customerService.getCustomerById(customerId);
+		return ResponseEntity.ok(CustomerMapper.toDTO(customer));
+	}
 
 }

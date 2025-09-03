@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/loans")
-@PreAuthorize("hasRole('AGENT')")
+
 public class LoanController {
 
     private final LoanService loanService;
@@ -26,6 +26,7 @@ public class LoanController {
     }
 
     // Create loan for a customer
+    @PreAuthorize("hasRole('AGENT')")
     @PostMapping("/customer/{customerId}")
     public LoanDTO createLoan(@PathVariable Long customerId, @RequestBody LoanDTO loanDTO) {
     	loanDTO.setDate(LocalDate.now());
@@ -38,6 +39,7 @@ public class LoanController {
 
 
     // Get all loans
+    @PreAuthorize("hasRole('AGENT','ADMIN')")
     @GetMapping
     public List<LoanDTO> getAllLoans() {
         return loanService.getAllLoans()
@@ -47,6 +49,7 @@ public class LoanController {
     }
 
     // Get loans for a specific customer
+    @PreAuthorize("hasRole('AGENT','ADMIN')")
     @GetMapping("/customer/{customerId}")
     public List<LoanDTO> getLoansByCustomer(@PathVariable Long customerId) {
         return loanService.getLoansByCustomer(customerId)
@@ -56,6 +59,7 @@ public class LoanController {
     }
 
     // Get loan by ID
+    @PreAuthorize("hasRole('AGENT','ADMIN')")
     @GetMapping("/{loanId}")
     public LoanDTO getLoanById(@PathVariable Long loanId) {
         Loan loan = loanService.getLoanById(loanId);
@@ -63,6 +67,7 @@ public class LoanController {
     }
 
     // Update loan
+    @PreAuthorize("hasRole('AGENT')")
     @PutMapping("/{loanId}")
     public LoanDTO updateLoan(@PathVariable Long loanId, @RequestBody LoanDTO loanDTO) {
         Loan loan = LoanMapper.toEntity(loanDTO);
@@ -71,49 +76,18 @@ public class LoanController {
     }
 
     // Delete loan
+    @PreAuthorize("hasRole('AGENT')")
     @DeleteMapping("/{loanId}")
     public String deleteLoan(@PathVariable Long loanId) {
         loanService.deleteLoan(loanId);
         return "Loan deleted successfully!";
     }
     
+    @PreAuthorize("hasRole('AGENT','ADMIN')")
     @GetMapping("/{loanId}/schedule")
     public List<LoanScheduleDTO> getLoanSchedule(@PathVariable Long loanId) {
-        Loan loan = loanService.getLoanById(loanId);
-
-        double principal = loan.getLoanVal();
-        double annualRate = loan.getInterestRate(); // e.g., 4%
-        int months = loan.getDuration();
-        LocalDate startDate = loan.getDate();
-
-        // simple interest total
-        double totalInterest = (principal * annualRate * (months / 12.0)) / 100;
-        double totalPayable = principal + totalInterest;
-
-        // monthly breakup
-        double monthlyPrincipal = principal / months;
-        double monthlyInterest = totalInterest / months;
-        double monthlyInstallment = monthlyPrincipal + monthlyInterest;
-
-        List<LoanScheduleDTO> schedule = new ArrayList<>();
-        double balance = totalPayable;
-
-        for (int i = 1; i <= months; i++) {
-            balance -= monthlyInstallment;
-
-            LoanScheduleDTO dto = new LoanScheduleDTO();
-            dto.setInstallmentNo(i);
-            dto.setLoanId(loan.getId());
-            dto.setPrincipalAmount(Math.round(principal * 100.0) / 100.0);
-            dto.setInterestAmount(Math.round(monthlyInterest * 100.0) / 100.0);
-            dto.setTotalInstallment(Math.round(monthlyInstallment * 100.0) / 100.0);
-            dto.setRemainingAmount(Math.max(0, Math.round(balance * 100.0) / 100.0));
-            dto.setDate(startDate.plusMonths(i));
-
-            schedule.add(dto);
-        }
-
-        return schedule;
+    	List<LoanScheduleDTO> schedule=loanService.getLoanSchedule(loanId);
+    	return schedule;
     }
 
 }
