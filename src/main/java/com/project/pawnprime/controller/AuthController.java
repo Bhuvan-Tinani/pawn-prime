@@ -60,7 +60,7 @@ public class AuthController {
         }
 
         String token = jwtUtil.generateToken(agent.getEmail(), "AGENT");
-        return ResponseEntity.ok(new LoginResponseAgentDTO(token, agent.getEmail(), "AGENT"));
+        return ResponseEntity.ok(new LoginResponseAgentDTO(token, agent.getEmail(), "AGENT",agent.getId()));
     }
 }
 

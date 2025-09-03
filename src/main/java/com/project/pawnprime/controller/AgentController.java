@@ -37,7 +37,7 @@ public class AgentController {
                 .stream()
                 .map(AgentMapper::toDTO)
                 .collect(Collectors.toList());
-    }
+    } 
 
     @GetMapping("/{id}")
     public ResponseEntity<AgentDTO> getById(@PathVariable Long id) {
@@ -60,5 +60,6 @@ public class AgentController {
         agentService.deleteAgent(id);
         return ResponseEntity.noContent().build();
     }
+    
 }
 
