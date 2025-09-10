@@ -10,6 +10,7 @@ import com.project.pawnprime.model.Agent;
 import com.project.pawnprime.service.AgentService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -49,7 +50,6 @@ public class AgentController {
 
     @PutMapping("/{id}")
     public ResponseEntity<AgentDTO> update(@PathVariable Long id, @RequestBody AgentDTO dto) {
-    	System.out.print("hello");
         Agent agent = AgentMapper.toEntity(dto);
         Agent updated = agentService.updateAgent(id, agent);
         return ResponseEntity.ok(AgentMapper.toDTO(updated));
@@ -61,5 +61,15 @@ public class AgentController {
         return ResponseEntity.noContent().build();
     }
     
+    @PostMapping("/setBlock/{id}")
+    public ResponseEntity<AgentDTO> setBlockStatus(
+            @PathVariable Long id,
+            @RequestBody Map<String, Boolean> body) {
+
+        boolean status = body.get("status"); // extract from JSON body
+        Agent updatedAgent = agentService.blockAgent(id, status);
+        return ResponseEntity.ok(AgentMapper.toDTO(updatedAgent));
+    }
+
 }
 

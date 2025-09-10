@@ -3,10 +3,15 @@ package com.project.pawnprime.controller;
 import com.project.pawnprime.dto.loanDTO.LoanCalcRequest;
 import com.project.pawnprime.dto.loanDTO.LoanCalcResponse;
 import com.project.pawnprime.dto.loanDTO.LoanDTO;
+import com.project.pawnprime.dto.loanDTO.LoanRequestStatus;
 import com.project.pawnprime.dto.loanDTO.LoanScheduleDTO;
 import com.project.pawnprime.mapper.LoanMapper;
+import com.project.pawnprime.model.Agent;
 import com.project.pawnprime.model.Loan;
+import com.project.pawnprime.service.AgentService;
 import com.project.pawnprime.service.LoanService;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,13 +22,15 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/loans")
-@PreAuthorize("hasRole('AGENT')")
+@PreAuthorize("hasRole('AGENT','ADMIN')")
 public class LoanController {
 
     private final LoanService loanService;
+    private final AgentService agentService;
 
-    public LoanController(LoanService loanService) {
+    public LoanController(LoanService loanService,AgentService agentService) {
         this.loanService = loanService;
+        this.agentService= agentService;
     }
 
     // Create loan for a customer
@@ -31,8 +38,13 @@ public class LoanController {
     public LoanDTO createLoan(@PathVariable Long customerId, @RequestBody LoanDTO loanDTO) {
         loanDTO.setDate(LocalDate.now()); // Always set today's date from server
         Loan loan = LoanMapper.toEntity(loanDTO); // DTO → Entity
+        Agent agent=agentService.getAgentById(loanDTO.getAgentId()).orElse(null);
+        if(agent!=null) {
+        loan.setAgent(agent);
         Loan savedLoan = loanService.createLoan(customerId, loan);
         return LoanMapper.toDTO(savedLoan); // Entity → DTO
+        }
+        return null;
     }
 
     // Get all loans
@@ -182,5 +194,27 @@ public class LoanController {
         
         return response;
     }
+    
+    @GetMapping("/agent/{agentId}")
+    public List<LoanDTO> getLoansByAgent(@PathVariable Long agentId) {
+    	List<Loan> loans = loanService.getLoansByAgentId(agentId);
+        return LoanMapper.toDTOList(loans);
+    }
+    
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<LoanRequestStatus>> getLoanByStatus(@PathVariable String status){
+    	List<Loan> loanlist=loanService.getLoanByStatus(status);
+    	return ResponseEntity.ok(LoanMapper.toAdminLoanDTOList(loanlist));
+    }
+    
+    @PostMapping("/status/{loanId}")
+    public boolean updateLoanStatus(@PathVariable Long loanId,@RequestBody Map<String, String> body) {
+    	String status = body.get("status");
+    	if(status.equals("approved") || status.equals("pending") || status.equals("rejected") || status.equals("t_done")) {
+        	return loanService.changeLoanStatus(loanId,status);
+    	}
+    	return false;
+    }
+    
 }
 

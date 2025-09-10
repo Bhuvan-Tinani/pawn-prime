@@ -56,5 +56,14 @@ public class AgentService {
                 .filter(agent -> agent.getPassword().equals(password)) // can replace with BCrypt check
                 .orElse(null);
     }
+    
+    public Agent blockAgent(long agentId, boolean status) {
+        Agent agent = getAgentById(agentId)
+                .orElseThrow(() -> new RuntimeException("Agent not found with id " + agentId));
+
+        agent.setStatus(status); // true = active, false = blocked
+        return agentRepository.save(agent);
+    }
+
 
 }

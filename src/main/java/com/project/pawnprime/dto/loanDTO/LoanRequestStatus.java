@@ -2,9 +2,11 @@ package com.project.pawnprime.dto.loanDTO;
 
 import java.time.LocalDate;
 
-public class LoanDTO {
-    private Long id;
-    
+import com.project.pawnprime.dto.customerDTO.CustomerDTO;
+
+public class LoanRequestStatus {
+	long loanId,agentId;
+	private String agentName;
 	private LocalDate date;
     private String typeOrnament;
     private double netGram;
@@ -14,28 +16,54 @@ public class LoanDTO {
     private double loanVal;
     private double interestRate;
     private int duration;
-    private Long customerId;  // 🔹 instead of Customer object, just store ID
-    private Long agentId;
     private String loanStatus;
+    private CustomerDTO customer;
     
-    
-	public String getLoanStatus() {
-		return loanStatus;
+	public LoanRequestStatus() {
+		super();
 	}
-	public void setLoanStatus(String loanStatus) {
+	public LoanRequestStatus(long loanId, long agentId, String agentName, LocalDate date, String typeOrnament,
+			double netGram, double purityPercent, double purityGram, double value, double loanVal, double interestRate,
+			int duration, String loanStatus, CustomerDTO customer) {
+		super();
+		this.loanId = loanId;
+		this.agentId = agentId;
+		this.agentName = agentName;
+		this.date = date;
+		this.typeOrnament = typeOrnament;
+		this.netGram = netGram;
+		this.purityPercent = purityPercent;
+		this.purityGram = purityGram;
+		this.value = value;
+		this.loanVal = loanVal;
+		this.interestRate = interestRate;
+		this.duration = duration;
 		this.loanStatus = loanStatus;
+		this.customer = customer;
 	}
-	public Long getId() {
-		return id;
+	public long getLoanId() {
+		return loanId;
+	}
+	public void setLoanId(long loanId) {
+		this.loanId = loanId;
+	}
+	public long getAgentId() {
+		return agentId;
+	}
+	public void setAgentId(long agentId) {
+		this.agentId = agentId;
+	}
+	public String getAgentName() {
+		return agentName;
+	}
+	public void setAgentName(String agentName) {
+		this.agentName = agentName;
 	}
 	public LocalDate getDate() {
 		return date;
 	}
 	public void setDate(LocalDate date) {
 		this.date = date;
-	}
-	public void setId(Long id) {
-		this.id = id;
 	}
 	public String getTypeOrnament() {
 		return typeOrnament;
@@ -85,21 +113,18 @@ public class LoanDTO {
 	public void setDuration(int duration) {
 		this.duration = duration;
 	}
-	public Long getCustomerId() {
-		return customerId;
+	public String getLoanStatus() {
+		return loanStatus;
 	}
-	public void setCustomerId(Long customerId) {
-		this.customerId = customerId;
+	public void setLoanStatus(String loanStatus) {
+		this.loanStatus = loanStatus;
 	}
-	public Long getAgentId() {
-		return agentId;
+	public CustomerDTO getCustomer() {
+		return customer;
 	}
-	public void setAgentId(Long agentId) {
-		this.agentId = agentId;
+	public void setCustomer(CustomerDTO customer) {
+		this.customer = customer;
 	}
-	
-	
-    // Getters & Setters
-    // ...
     
+	   
 }

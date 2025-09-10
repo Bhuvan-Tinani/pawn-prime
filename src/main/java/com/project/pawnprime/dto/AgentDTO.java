@@ -6,6 +6,7 @@ public class AgentDTO {
     private String email;
     private String password;
     private String phoneNumber;
+    private boolean status=true;
 
     // Getters & Setters
     public Long getId() { return id; }
@@ -22,4 +23,11 @@ public class AgentDTO {
 
     public String getPhoneNumber() { return phoneNumber; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+	public boolean isStatus() {
+		return status;
+	}
+	public void setStatus(boolean status) {
+		this.status = status;
+	}
+    
 }

@@ -21,11 +21,18 @@ public class Loan {
     private Double loanVal;        // sanctioned loan amount
     private Double interestRate;   // % interest rate
     private Integer duration;      // duration in months
+    private String loanStatus;
 
-    // 🔗 Relationship: Many loans can belong to one customer
+	// 🔗 Relationship: Many loans can belong to one customer
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "agent_id", nullable = false)
+    private Agent agent;
+    
+    
 
     // --- Getters & Setters ---
     public Long getId() {
@@ -115,4 +122,21 @@ public class Loan {
     public void setCustomer(Customer customer) {
         this.customer = customer;
     }
+
+	public Agent getAgent() {
+		return agent;
+	}
+
+	public void setAgent(Agent agent) {
+		this.agent = agent;
+	}
+    
+
+    public String getLoanStatus() {
+		return loanStatus;
+	}
+
+	public void setLoanStatus(String loanStatus) {
+		this.loanStatus = loanStatus;
+	}
 }

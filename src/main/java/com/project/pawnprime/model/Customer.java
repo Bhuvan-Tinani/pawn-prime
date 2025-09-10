@@ -31,11 +31,17 @@ public class Customer {
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CustomerAddress> addresses;
 
+    @Column(columnDefinition = "TEXT")   // ✅ long URL for profile photo
+    private String photoUrl;
+
+    @Column(columnDefinition = "TEXT")   // ✅ long URL for aadhar image
+    private String aadharUrl;
+
     // Constructors
     public Customer() {}
 
     public Customer(Long id, String firstName, String middleName, String lastName,
-                    String mobile, String aadharNo, LocalDate dob, Agent createdBy) {
+                    String mobile, String aadharNo, LocalDate dob, Agent createdBy,String photoUrl,String aadharUrl) {
         this.id = id;
         this.firstName = firstName;
         this.middleName = middleName;
@@ -44,6 +50,8 @@ public class Customer {
         this.aadharNo = aadharNo;
         this.dob = dob;
         this.createdBy = createdBy;
+        this.photoUrl=photoUrl;
+        this.aadharUrl=aadharUrl;
     }
 
     // Getters & Setters
@@ -73,4 +81,10 @@ public class Customer {
 
     public List<CustomerAddress> getAddresses() { return addresses; }
     public void setAddresses(List<CustomerAddress> addresses) { this.addresses = addresses; }
+
+    public String getPhotoUrl() { return photoUrl; }
+    public void setPhotoUrl(String photoUrl) { this.photoUrl = photoUrl; }
+
+    public String getAadharUrl() { return aadharUrl; }
+    public void setAadharUrl(String aadharUrl) { this.aadharUrl = aadharUrl; }
 }

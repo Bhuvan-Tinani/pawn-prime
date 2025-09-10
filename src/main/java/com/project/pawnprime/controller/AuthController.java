@@ -53,11 +53,16 @@ public class AuthController {
     @PostMapping("/agent/login")
     public ResponseEntity<?> agentLogin(@RequestBody LoginRequestAgentDTO request) {
         Agent agent = agentService.validateAgentLogin(request.getUsername(), request.getPassword());
+    	
 
         if (agent == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Invalid email or password"));
         }
+        if(!agent.isStatus()) {
+    		return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Agent is Blocked"));
+    	}
 
         String token = jwtUtil.generateToken(agent.getEmail(), "AGENT");
         return ResponseEntity.ok(new LoginResponseAgentDTO(token, agent.getEmail(), "AGENT",agent.getId()));

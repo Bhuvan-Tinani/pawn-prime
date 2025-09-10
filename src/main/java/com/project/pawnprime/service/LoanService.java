@@ -115,6 +115,7 @@ public class LoanService {
     }
 
     public Loan createLoan(Long customerId, Loan loan) {
+    	loan.setLoanStatus("pending");
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new RuntimeException("Customer not found with id " + customerId));
         loan.setCustomer(customer);
@@ -222,4 +223,26 @@ public class LoanService {
     public LocalDateTime getLastFetchedTime() {
         return LAST_FETCHED;
     }
+    
+    public List<Loan> getLoansByAgentId(Long agentId) {
+        return loanRepository.findByAgentId(agentId);
+    }
+    
+    public List<Loan> getLoanByStatus(String status){
+    	List<Loan> loans=loanRepository.findByLoanStatus("pending");
+    	return loans;
+    }
+    
+    public boolean changeLoanStatus(long loanId,String status) {
+    	try {
+    		Loan loan=getLoanById(loanId);
+    		loan.setLoanStatus(status);
+    		loanRepository.save(loan);
+    	}catch(Exception e) {
+    		e.printStackTrace();
+    		return false;
+    	}
+    	return true;
+    }
+    
 }

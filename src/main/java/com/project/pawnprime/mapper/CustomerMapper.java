@@ -38,6 +38,8 @@ public class CustomerMapper {
         dto.setLastName(customer.getLastName());
         dto.setMobile(customer.getMobile());
         dto.setAadharNo(customer.getAadharNo());
+        dto.setPhotourl(customer.getPhotoUrl());
+        dto.setAadharUrl(customer.getAadharUrl());
 
         if (customer.getDob() != null) {
             dto.setDob(customer.getDob()); // LocalDate → String

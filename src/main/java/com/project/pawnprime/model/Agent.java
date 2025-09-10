@@ -31,9 +31,16 @@ public class Agent {
     @Size(min = 10, max = 15, message = "Phone number must be valid")
     private String phoneNumber;
 
+    // ✅ Status field: active (true) / blocked (false)
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
+    private boolean status = true;
+
     // ✅ Added customer list
     @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Customer> customerList;
+
+    @OneToMany(mappedBy = "agent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Loan> loanlist;
 
     // Default constructor
     public Agent() {}
@@ -45,6 +52,7 @@ public class Agent {
         this.email = email;
         this.password = password;
         this.phoneNumber = phoneNumber;
+        this.status = true; // default
     }
 
     // Getters and Setters
@@ -63,6 +71,12 @@ public class Agent {
     public String getPhoneNumber() { return phoneNumber; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
 
+    public boolean isStatus() { return status; }
+    public void setStatus(boolean status) { this.status = status; }
+
     public List<Customer> getCustomerList() { return customerList; }
     public void setCustomerList(List<Customer> customerList) { this.customerList = customerList; }
+
+    public List<Loan> getLoanlist() { return loanlist; }
+    public void setLoanlist(List<Loan> loanlist) { this.loanlist = loanlist; }
 }

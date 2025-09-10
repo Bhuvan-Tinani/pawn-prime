@@ -12,6 +12,7 @@ public class AgentMapper {
         dto.setEmail(agent.getEmail());
         dto.setPassword(agent.getPassword());
         dto.setPhoneNumber(agent.getPhoneNumber());
+        dto.setStatus(agent.isStatus());
         return dto;
     }
 
@@ -22,6 +23,7 @@ public class AgentMapper {
         agent.setEmail(dto.getEmail());
         agent.setPassword(dto.getPassword());
         agent.setPhoneNumber(dto.getPhoneNumber());
+        agent.setStatus(dto.isStatus());
         return agent;
     }
 }

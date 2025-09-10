@@ -7,9 +7,12 @@ import com.project.pawnprime.model.Customer;
 import com.project.pawnprime.model.CustomerAddress;
 import com.project.pawnprime.service.AgentService;
 import com.project.pawnprime.service.CustomerService;
+
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,35 +33,41 @@ public class CustomerController {
 	// clarity)
 
 	@PreAuthorize("hasRole('AGENT')")
-	@PostMapping("/{agentId}")
-	public ResponseEntity<String> createCustomer(@PathVariable Long agentId, @RequestBody CustomerDTO customerDTO) {
+	@PostMapping(value = "/{agentId}", consumes = {"multipart/form-data"})
+	public ResponseEntity<String> createCustomer(
+	        @PathVariable Long agentId,
+	        @RequestPart("customer") CustomerDTO customerDTO,
+	        @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
+	        @RequestPart(value = "aadharImage", required = false) MultipartFile aadharImage) {
 
-		// Ensure DTO agentId matches path agentId (if provided)
-		if (customerDTO.getAgentId() != null && !customerDTO.getAgentId().equals(agentId)) {
-			return ResponseEntity.badRequest().build();
-		}
+	    // ✅ Ensure DTO agentId matches path agentId
+	    if (customerDTO.getAgentId() != null && !customerDTO.getAgentId().equals(agentId)) {
+	        return ResponseEntity.badRequest().build();
+	    }
 
-		// Convert DTO -> Entity
-		Customer customer = CustomerMapper.toEntity(customerDTO);
+	    // ✅ Convert DTO → Entity
+	    Customer customer = CustomerMapper.toEntity(customerDTO);
 
-		// Save customer
+	    // ✅ Set address from DTO
+	    CustomerAddress cusAddr = new CustomerAddress();
+	    cusAddr.setLine1(customerDTO.getAdrLine1());
+	    cusAddr.setLine2(customerDTO.getAdrLine2());
+	    cusAddr.setPincode(customerDTO.getPincode());
+	    cusAddr.setCity(customerDTO.getCity());
+	    cusAddr.setState(customerDTO.getState());
+	    cusAddr.setCountry(customerDTO.getCountry());
+	    cusAddr.setCustomer(customer);
 
-		CustomerAddress cusAddr = new CustomerAddress();
-		cusAddr.setLine1(customerDTO.getAdrLine1());
-		cusAddr.setLine2(customerDTO.getAdrLine2());
-		cusAddr.setPincode(customerDTO.getPincode());
-		cusAddr.setCity(customerDTO.getCity());
-		cusAddr.setState(customerDTO.getState());
-		cusAddr.setCountry(customerDTO.getCountry());
-		cusAddr.setCustomer(customer);
-		List<CustomerAddress> cusAddres = new ArrayList<>();
-		cusAddres.add(cusAddr);
-		customer.setAddresses(cusAddres);
-		Customer saved = customerService.createCustomer(customer, agentId);
+	    List<CustomerAddress> cusAddres = new ArrayList<>();
+	    cusAddres.add(cusAddr);
+	    customer.setAddresses(cusAddres);
 
-		// Return DTO instead of entity
-		return ResponseEntity.ok("Customer details created successfully!");
+	    // ✅ Save with images
+	    Customer saved = customerService.createCustomer(customer, agentId, profileImage, aadharImage);
+
+	    return ResponseEntity.ok("Customer details created successfully!");
 	}
+
 
 	@PreAuthorize("hasRole('AGENT','ADMIN')")
 	@GetMapping
@@ -86,5 +95,14 @@ public class CustomerController {
 		Customer customer = customerService.getCustomerById(customerId);
 		return ResponseEntity.ok(CustomerMapper.toDTO(customer));
 	}
+	
+	@PreAuthorize("hasRole('AGENT','ADMIN')")
+	@GetMapping("/search/aadhar/{aadharNo}")
+	public ResponseEntity<CustomerDTO> getCustomerByAadhar(@PathVariable String aadharNo) {
+	    return customerService.getCustomerByAadharNo(aadharNo)
+	            .map(customer -> ResponseEntity.ok(CustomerMapper.toDTO(customer)))
+	            .orElse(ResponseEntity.notFound().build());
+	}
+
 
 }

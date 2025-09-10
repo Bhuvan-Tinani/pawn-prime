@@ -17,8 +17,25 @@ public class CustomerDTO {
     private String state;
     private String pincode;
     private String country;
+    private String photourl,aadharUrl;
 
-    public String getAdrLine1() {
+	public String getPhotourl() {
+		return photourl;
+	}
+
+	public void setPhotourl(String photourl) {
+		this.photourl = photourl;
+	}
+
+	public String getAadharUrl() {
+		return aadharUrl;
+	}
+
+	public void setAadharUrl(String aadharUrl) {
+		this.aadharUrl = aadharUrl;
+	}
+
+	public String getAdrLine1() {
 		return adrLine1;
 	}
 
