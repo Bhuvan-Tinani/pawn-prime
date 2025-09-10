@@ -1,5 +1,6 @@
 package com.project.pawnprime.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.project.pawnprime.model.Agent;
 import com.project.pawnprime.repo.AgentRepository;
@@ -11,6 +12,8 @@ import java.util.Optional;
 public class AgentService {
 
     private final AgentRepository agentRepository;
+    @Autowired
+    private EmailService emailService;
 
     public AgentService(AgentRepository agentRepository) {
         this.agentRepository = agentRepository;
@@ -20,6 +23,7 @@ public class AgentService {
         if (agentRepository.existsByEmail(agent.getEmail())) {
             throw new RuntimeException("Agent with email already exists");
         }
+        emailService.sendCredentials(agent.getEmail(),agent.getName(),agent.getPassword());
         return agentRepository.save(agent);
     }
 
