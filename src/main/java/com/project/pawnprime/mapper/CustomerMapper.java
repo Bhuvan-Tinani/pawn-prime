@@ -46,6 +46,7 @@ public class CustomerMapper {
         }
 
         if (customer.getCreatedBy() != null) {
+        	
             dto.setAgentId(customer.getCreatedBy().getId()); // include agentId
         }
         

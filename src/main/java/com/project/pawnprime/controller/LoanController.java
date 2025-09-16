@@ -210,7 +210,7 @@ public class LoanController {
     @PostMapping("/status/{loanId}")
     public boolean updateLoanStatus(@PathVariable Long loanId,@RequestBody Map<String, String> body) {
     	String status = body.get("status");
-    	if(status.equals("approved") || status.equals("pending") || status.equals("rejected") || status.equals("t_done")) {
+    	if(status.equals("approved") || status.equals("pending") || status.equals("rejected")) {
         	return loanService.changeLoanStatus(loanId,status);
     	}
     	return false;
