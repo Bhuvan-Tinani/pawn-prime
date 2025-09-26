@@ -17,8 +17,15 @@ public class LoanDTO {
     private Long customerId;  // 🔹 instead of Customer object, just store ID
     private Long agentId;
     private String loanStatus;
+    private String customerName;
     
     
+	public String getCustomerName() {
+		return customerName;
+	}
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
+	}
 	public String getLoanStatus() {
 		return loanStatus;
 	}

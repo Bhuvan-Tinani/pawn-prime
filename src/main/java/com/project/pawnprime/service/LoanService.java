@@ -245,4 +245,10 @@ public class LoanService {
     	return true;
     }
     
+    public Loan getByStatusAndId(Long id,String status){
+    	Loan loans=loanRepository.findByLoanStatusAndId(status,id);
+    	return loans;
+    }
+    
+    
 }

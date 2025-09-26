@@ -81,7 +81,7 @@ public class AuthController {
                     .body(Map.of("error", "Agent is Blocked"));
         }
 
-        // Generate and store OTP
+        // Generate an	d store OTP
         String otp = generateOtp();
         otpStorage.put(agent.getEmail(), otp);
 

@@ -10,6 +10,7 @@ import com.project.pawnprime.model.Agent;
 import com.project.pawnprime.model.Loan;
 import com.project.pawnprime.service.AgentService;
 import com.project.pawnprime.service.LoanService;
+import com.project.pawnprime.service.RepaymentTransactionService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,10 +28,12 @@ public class LoanController {
 
     private final LoanService loanService;
     private final AgentService agentService;
+    private final RepaymentTransactionService repaymentTransService;
 
-    public LoanController(LoanService loanService,AgentService agentService) {
+    public LoanController(LoanService loanService,AgentService agentService,RepaymentTransactionService repaymentTransService) {
         this.loanService = loanService;
         this.agentService= agentService;
+        this.repaymentTransService=repaymentTransService;
     }
 
     // Create loan for a customer
@@ -214,6 +217,57 @@ public class LoanController {
         	return loanService.changeLoanStatus(loanId,status);
     	}
     	return false;
+    }
+    
+    @GetMapping("/{loanId}/repayment")
+    public List<LoanScheduleDTO> getLoanRepayment(@PathVariable Long loanId) {
+        Loan loan = loanService.getByStatusAndId(loanId, "T_DONE");
+        if(loan == null) {
+            return null;
+        }
+        
+        int paidLoan = (int) repaymentTransService.getRepaymentCountForLoan(loanId);
+
+        double principal = loan.getLoanVal();
+        double annualRate = loan.getInterestRate(); // e.g., 4%
+        int months = loan.getDuration();
+        LocalDate startDate = loan.getDate();
+
+        // simple interest total
+        double totalInterest = (principal * annualRate * (months / 12.0)) / 100;
+        double totalPayable = principal + totalInterest;
+
+        // monthly breakup
+        double monthlyPrincipal = principal / months;
+        double monthlyInterest = totalInterest / months;
+        double monthlyInstallment = monthlyPrincipal + monthlyInterest;
+
+        List<LoanScheduleDTO> schedule = new ArrayList<>();
+        double balance = totalPayable;
+
+        for (int i = 1; i <= months; i++) {
+            balance -= monthlyInstallment;
+
+            LoanScheduleDTO dto = new LoanScheduleDTO();
+            dto.setInstallmentNo(i);
+            dto.setLoanId(loan.getId());
+            dto.setPrincipalAmount(Math.round(monthlyPrincipal * 100.0) / 100.0);
+            dto.setInterestAmount(Math.round(monthlyInterest * 100.0) / 100.0);
+            dto.setTotalInstallment(Math.round(monthlyInstallment * 100.0) / 100.0);
+            dto.setRemainingAmount(Math.max(0, Math.round(balance * 100.0) / 100.0));
+            dto.setDate(startDate.plusMonths(i));
+            
+            // Set status based on paid installments count
+            if (i <= paidLoan) {
+                dto.setStatus("PAID");
+            } else {
+                dto.setStatus("PENDING");
+            }
+
+            schedule.add(dto);
+        }
+
+        return schedule;
     }
     
 }

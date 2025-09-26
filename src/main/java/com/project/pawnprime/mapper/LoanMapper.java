@@ -26,6 +26,7 @@ public class LoanMapper {
         dto.setCustomerId(loan.getCustomer().getId());
         dto.setAgentId(loan.getAgent().getId());
         dto.setLoanStatus(loan.getLoanStatus());
+        dto.setCustomerName(loan.getCustomer().getFirstName()+" "+loan.getCustomer().getMiddleName()+" "+loan.getCustomer().getLastName());
         return dto;
     }
 
