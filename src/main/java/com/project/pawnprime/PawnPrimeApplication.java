@@ -9,5 +9,4 @@ public class PawnPrimeApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(PawnPrimeApplication.class, args);
 	}
-
 }

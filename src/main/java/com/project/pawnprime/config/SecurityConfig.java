@@ -33,21 +33,30 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Add CORS configuration
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
+        http
+            .csrf(csrf -> csrf.disable()) // If you're using REST API
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .authorizeHttpRequests(auth -> auth
+                // ✅ Allow OTP endpoints without authentication
+                .requestMatchers("/api/customers/otp/send").permitAll()
+                .requestMatchers("/api/customers/otp/verify").permitAll()
+                
+                // Your other public endpoints
+                .requestMatchers("/api/auth/**").permitAll()
+                
+                // All other requests need authentication
+                .anyRequest().authenticated()
+            )
+            // Add your JWT filter and other configurations
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        
+        return http.build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000/")); // React frontend
+        configuration.setAllowedOrigins(List.of("http://localhost:3000")); // React frontend
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

@@ -1,5 +1,6 @@
 package com.project.pawnprime.controller;
 
+import com.project.pawnprime.dto.OtpRequest;
 import com.project.pawnprime.dto.customerDTO.CustomerDTO;
 import com.project.pawnprime.mapper.CustomerMapper;
 import com.project.pawnprime.model.Agent;
@@ -7,6 +8,7 @@ import com.project.pawnprime.model.Customer;
 import com.project.pawnprime.model.CustomerAddress;
 import com.project.pawnprime.service.AgentService;
 import com.project.pawnprime.service.CustomerService;
+import com.project.pawnprime.service.OtpService;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,10 +25,12 @@ public class CustomerController {
 
 	private final CustomerService customerService;
 	private final AgentService agentService;
-
-	public CustomerController(CustomerService customerService, AgentService agentService) {
+	private final OtpService otpService;
+	
+	public CustomerController(CustomerService customerService, AgentService agentService, OtpService otpService) {
 		this.customerService = customerService;
 		this.agentService = agentService;
+		this.otpService = otpService;
 	}
 
 	// Create customer for a given agent (agentId in path; also allowed in body for
@@ -104,5 +108,33 @@ public class CustomerController {
 	            .orElse(ResponseEntity.notFound().build());
 	}
 
+	// ------------------- OTP -------------------
 
+	// Send OTP
+	@PostMapping("/otp/send")
+	public ResponseEntity<String> sendOtp(@RequestParam String phoneNumber) {
+	    phoneNumber = phoneNumber.trim(); // remove spaces
+	    if (!phoneNumber.startsWith("+")) {
+	        phoneNumber = "+" + phoneNumber; // ensure + prefix
+	    }
+	    boolean sent = otpService.sendOtp(phoneNumber);
+	    return sent ? ResponseEntity.ok("OTP sent successfully!") 
+	                : ResponseEntity.status(500).body("Failed to send OTP!");
+	}
+
+	// Verify OTP
+	@PostMapping("/otp/verify")
+	public ResponseEntity<String> verifyOtp(@RequestParam String phoneNumber, 
+	                                        @RequestParam String otp) {
+	    phoneNumber = phoneNumber.trim(); // remove spaces
+	    if (!phoneNumber.startsWith("+")) {
+	        phoneNumber = "+" + phoneNumber; // ensure + prefix
+	    }
+	    otp = otp.trim(); // remove accidental spaces
+	    boolean verified = otpService.verifyOtp(phoneNumber, otp);
+	    return verified ? ResponseEntity.ok("OTP verified successfully!") 
+	                    : ResponseEntity.badRequest().body("Invalid OTP!");
+	}
+
+    
 }
