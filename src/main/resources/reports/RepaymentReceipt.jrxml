@@ -1,0 +1,8 @@
+<!-- Created with Jaspersoft Studio version 7.0.3.final using JasperReports Library version 7.0.3-41034ca841d452f3305ba55b9042260aaa1ab5dd  -->
+<jasperReport name="HelloWorldReport" language="java" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b03a963b-49e1-4285-b360-1ad6a2f84568">
+	<title height="70">
+		<element kind="staticText" uuid="bd560cf2-e1f7-43d3-b16a-24157f939a29" x="0" y="20" width="555" height="30" fontSize="24.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[Hello, World!]]></text>
+		</element>
+	</title>
+</jasperReport>
