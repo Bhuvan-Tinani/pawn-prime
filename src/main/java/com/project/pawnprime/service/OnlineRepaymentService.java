@@ -83,5 +83,10 @@ public class OnlineRepaymentService {
         return repaymentRepo.save(txn);
     }
    
+    // Convenience method used by reporting/controllers to fetch all online repayments
+    public List<OnlineRepaymentTransaction> getAllRepayments() {
+        return repaymentRepo.findAll();
+    }
+   
     
 }
