@@ -50,7 +50,16 @@ public class RepaymentTransactionService {
         return repaymentRepo.findByLoanId(loanId);
     }
     
+    public List<RepaymentTransaction> getAllRepayments() {
+        return repaymentRepo.findAll();
+    }
+    
     public long getRepaymentCountForLoan(Long loanId) {
         return repaymentRepo.findByLoanId(loanId).size();
     }
+    
+    public List<RepaymentTransaction> getRepaymentsByAgent(Long agentId) {
+        return repaymentRepo.findByAgentId(agentId);
+    }
+
 }

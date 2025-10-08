@@ -17,11 +17,15 @@ public class LoanTransactionMapper {
                 txn.getId(),
                 txn.getLoan() != null ? txn.getLoan().getId() : null,
                 txn.getAgent() != null ? txn.getAgent().getId() : null,
+                txn.getAgent().getEmail(),
+                txn.getAgent().getName(),
+                txn.getCustomer().getFirstName()+" "+txn.getCustomer().getLastName(),
                 txn.getCustomer() != null ? txn.getCustomer().getId() : null,
                 txn.getAmount(),
                 txn.getPaymentMode(),
                 txn.getTransactionRef(),
                 txn.getTransactionDate()
+                
         );
     }
 

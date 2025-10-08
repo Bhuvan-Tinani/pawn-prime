@@ -82,6 +82,14 @@ public class OnlineRepaymentService {
         txn.setStatus(status);  // e.g., "SUCCESS"
         return repaymentRepo.save(txn);
     }
-   
     
+    public List<OnlineRepaymentTransaction> getRepaymentsByAgent(Long agentId) {
+        // The repository method will need to query based on Loan.agentId
+        return repaymentRepo.findByLoanAgentId(agentId);
+    }
+   
+    public List<OnlineRepaymentTransaction> getAllRepayments() {
+        return repaymentRepo.findAll();
+    }
+
 }

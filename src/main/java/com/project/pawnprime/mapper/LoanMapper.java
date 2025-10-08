@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import com.project.pawnprime.dto.customerDTO.CustomerDTO;
 import com.project.pawnprime.dto.loanDTO.LoanDTO;
 import com.project.pawnprime.dto.loanDTO.LoanRequestStatus;
+import com.project.pawnprime.dto.loanDTO.LoanSummaryDTO;
 import com.project.pawnprime.model.Loan;
 
 public class LoanMapper {
@@ -83,4 +84,15 @@ public class LoanMapper {
     	}
     	return list;
     }
+    
+    public static LoanSummaryDTO toSummaryDTO(Loan loan) {
+        return new LoanSummaryDTO(loan.getId(), loan.getLoanVal());
+    }
+
+    public static List<LoanSummaryDTO> toSummaryDTOList(List<Loan> loans) {
+        return loans.stream()
+                    .map(LoanMapper::toSummaryDTO)
+                    .collect(Collectors.toList());
+    }
+
 }
