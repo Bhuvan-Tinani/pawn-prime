@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin/agents")
-@PreAuthorize("hasRole('ADMIN')")
 public class AgentController {
 
     private final AgentService agentService;
@@ -72,4 +71,6 @@ public class AgentController {
     }
 
 }
+
+
 

@@ -52,7 +52,10 @@ public class AgentService {
     }
     
     public Agent getAgentByEmail(String email) {
-        return agentRepository.findByEmail(email).orElse(null);
+    	//System.out.println(email + "   line 55");
+    	Agent agent = agentRepository.findByEmail(email).orElse(null);
+    	//System.out.println(agent.getId());
+        return agent;
     }
     
     public Agent validateAgentLogin(String email, String password) {
