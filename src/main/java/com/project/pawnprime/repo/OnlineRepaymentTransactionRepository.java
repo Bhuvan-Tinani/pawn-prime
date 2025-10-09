@@ -15,4 +15,7 @@ public interface OnlineRepaymentTransactionRepository extends JpaRepository<Onli
 	Optional<OnlineRepaymentTransaction> findByOrderId(String orderId);
 
 	Optional<OnlineRepaymentTransaction> findByPaymentId(String paymentId);
+	
+	List<OnlineRepaymentTransaction> findByLoanAgentId(Long agentId);
+
 }

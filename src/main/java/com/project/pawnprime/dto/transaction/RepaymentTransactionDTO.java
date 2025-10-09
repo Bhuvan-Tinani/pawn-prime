@@ -5,7 +5,25 @@ import java.time.LocalDateTime;
 
 public class RepaymentTransactionDTO {
     private Long loanId;
-    private Long agentId;          // optional for CASH payments
+    private String agentName;
+    private String customerName;
+    public String getAgentName() {
+		return agentName;
+	}
+
+	public void setAgentName(String agentName) {
+		this.agentName = agentName;
+	}
+
+	public String getCustomerName() {
+		return customerName;
+	}
+
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
+	}
+
+	private Long agentId;          // optional for CASH payments
     private Double principalAmt;
     private Double interestAmt;
     private PaymentType type;      // ONLINE / CASH

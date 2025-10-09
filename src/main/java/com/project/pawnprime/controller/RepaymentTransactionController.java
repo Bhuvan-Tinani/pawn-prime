@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/repayments")
@@ -48,11 +49,23 @@ public class RepaymentTransactionController {
 		return allSaved;
 	}
 
-//    // ✅ Get all repayments for a loan
-//    @GetMapping("/loan/{loanId}")
-//    public List<RepaymentTransaction> getRepaymentsByLoan(@PathVariable Long loanId) {
-//        return repaymentService.getRepaymentsByLoan(loanId);
-//    }
+	@GetMapping("/loan/{loanId}")
+    public List<RepaymentTransactionDTO> getRepaymentsByLoan(@PathVariable Long loanId) {
+        List<RepaymentTransaction> transactions = repaymentService.getRepaymentsByLoan(loanId);
+        return transactions.stream().map(txn -> {
+	        RepaymentTransactionDTO dto = new RepaymentTransactionDTO();
+	        dto.setLoanId(txn.getLoan().getId());
+	        dto.setAgentId(txn.getAgent() != null ? txn.getAgent().getId() : null);
+	        dto.setPrincipalAmt(txn.getPrincipalAmt());
+	        dto.setInterestAmt(txn.getInterestAmt());
+	        dto.setType(txn.getType());
+	        dto.setDate(txn.getDate());
+	        dto.setPaidDate(txn.getPaidDate());
+	        dto.setAgentName(txn.getLoan().getAgent().getName());
+	        dto.setCustomerName(txn.getLoan().getCustomer().getFirstName()+" "+txn.getLoan().getCustomer().getLastName());
+	        return dto;
+	    }).collect(Collectors.toList());
+    }
 
 	@GetMapping("/loan/{loanId}/receipt")
 	public void generateLoanReceipt(@PathVariable Long loanId, // Now takes loanId
@@ -67,5 +80,45 @@ public class RepaymentTransactionController {
 		// 2. Call the service with loanId
 		receiptService.exportLoanReceipt(loanId, response.getOutputStream());
 	}
+	
+	@GetMapping
+    public List<RepaymentTransactionDTO> getAllRepayments() {
+        List<RepaymentTransaction> transactions = repaymentService.getAllRepayments();
+        return transactions.stream().map(txn -> {
+            RepaymentTransactionDTO dto = new RepaymentTransactionDTO();
+            dto.setLoanId(txn.getLoan().getId());
+            dto.setAgentId(txn.getAgent() != null ? txn.getAgent().getId() : null);
+            dto.setPrincipalAmt(txn.getPrincipalAmt());
+            dto.setInterestAmt(txn.getInterestAmt());
+            dto.setType(txn.getType());
+            dto.setDate(txn.getDate());
+            dto.setPaidDate(txn.getPaidDate());
+            
+            dto.setAgentName(txn.getLoan().getAgent().getName());
+            
+	        dto.setCustomerName(txn.getLoan().getCustomer().getFirstName()+" "+txn.getLoan().getCustomer().getLastName());
+            return dto;
+        }).collect(Collectors.toList());
+    }
+	
+	@GetMapping("/agent/{agentId}")
+	public List<RepaymentTransactionDTO> getRepaymentsByAgent(@PathVariable Long agentId) {
+	    List<RepaymentTransaction> transactions = repaymentService.getRepaymentsByAgent(agentId);
+
+	    return transactions.stream().map(txn -> {
+	        RepaymentTransactionDTO dto = new RepaymentTransactionDTO();
+	        dto.setLoanId(txn.getLoan().getId());
+	        dto.setAgentId(txn.getAgent() != null ? txn.getAgent().getId() : null);
+	        dto.setPrincipalAmt(txn.getPrincipalAmt());
+	        dto.setInterestAmt(txn.getInterestAmt());
+	        dto.setType(txn.getType());
+	        dto.setDate(txn.getDate());
+	        dto.setPaidDate(txn.getPaidDate());
+	        dto.setAgentName(txn.getLoan().getAgent().getName());
+	        dto.setCustomerName(txn.getLoan().getCustomer().getFirstName()+" "+txn.getLoan().getCustomer().getLastName());
+	        return dto;
+	    }).collect(Collectors.toList());
+	}
+
 
 }

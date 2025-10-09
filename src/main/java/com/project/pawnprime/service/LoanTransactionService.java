@@ -102,6 +102,9 @@ public class LoanTransactionService {
         dto.setMode(txn.getPaymentMode());
         dto.setTransactionRef(txn.getTransactionRef());
         dto.setTransactionDate(txn.getTransactionDate());
+        dto.setAgentEmail(txn.getAgent().getEmail());
+        dto.setAgentName(txn.getAgent().getName());
+        dto.setCustomerName(txn.getCustomer().getFirstName()+" "+txn.getCustomer().getLastName());
         return dto;
     }
 

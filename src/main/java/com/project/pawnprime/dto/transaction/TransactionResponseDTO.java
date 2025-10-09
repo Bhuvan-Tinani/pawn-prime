@@ -9,6 +9,9 @@ public class TransactionResponseDTO {
     private Long transactionId;
     private Long loanId;
     private Long agentId;
+    private String agentName;
+    private String agentEmail;
+    private String customerName;
     private Long customerId;
     private Double amount;
     private PaymentMode mode;
@@ -18,20 +21,69 @@ public class TransactionResponseDTO {
     // --- Constructors ---
     public TransactionResponseDTO() {}
 
-    public TransactionResponseDTO(Long transactionId, Long loanId, Long agentId, Long customerId,
-                                  Double amount, PaymentMode mode, String transactionRef,
-                                  LocalDateTime transactionDate) {
-        this.transactionId = transactionId;
-        this.loanId = loanId;
-        this.agentId = agentId;
-        this.customerId = customerId;
-        this.amount = amount;
-        this.mode = mode;
-        this.transactionRef = transactionRef;
-        this.transactionDate = transactionDate;
-    }
+    
 
-    // --- Getters and Setters ---
+    public TransactionResponseDTO(Long transactionId, Long loanId, Long agentId, String agentName, String agentEmail,
+			String customerName, Long customerId, Double amount, PaymentMode mode, String transactionRef,
+			LocalDateTime transactionDate) {
+		super();
+		this.transactionId = transactionId;
+		this.loanId = loanId;
+		this.agentId = agentId;
+		this.agentName = agentName;
+		this.agentEmail = agentEmail;
+		this.customerName = customerName;
+		this.customerId = customerId;
+		this.amount = amount;
+		this.mode = mode;
+		this.transactionRef = transactionRef;
+		this.transactionDate = transactionDate;
+	}
+    
+//    public TransactionResponseDTO(Long transactionId, Long loanId, Long agentId, String agentName, String agentEmail,
+//			String customerName, Long customerId, Double amount, PaymentMode mode, String transactionRef,
+//			LocalDateTime transactionDate) {
+//		super();
+//		this.transactionId = transactionId;
+//		this.loanId = loanId;
+//		this.agentId = agentId;
+//		this.agentName = agentName;
+//		this.agentEmail = agentEmail;
+//		this.customerName = customerName;
+//		this.customerId = customerId;
+//		this.amount = amount;
+//		this.mode = mode;
+//		this.transactionRef = transactionRef;
+//		this.transactionDate = transactionDate;
+//	}
+
+
+
+	public String getAgentName() {
+		return agentName;
+	}
+
+	public void setAgentName(String agentName) {
+		this.agentName = agentName;
+	}
+
+	public String getAgentEmail() {
+		return agentEmail;
+	}
+
+	public void setAgentEmail(String agentEmail) {
+		this.agentEmail = agentEmail;
+	}
+
+	public String getCustomerName() {
+		return customerName;
+	}
+
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
+	}
+
+	// --- Getters and Setters ---
     public Long getTransactionId() {
         return transactionId;
     }

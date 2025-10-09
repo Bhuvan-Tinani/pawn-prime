@@ -250,5 +250,8 @@ public class LoanService {
     	return loans;
     }
     
-    
+    public List<Loan> getLoansByCustomerAadhar(String aadharNo) {
+        return loanRepository.findByCustomerAadharNo(aadharNo);
+    }
+
 }
