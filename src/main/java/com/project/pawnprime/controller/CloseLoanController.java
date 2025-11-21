@@ -1,7 +1,6 @@
 package com.project.pawnprime.controller;
 
 import com.project.pawnprime.dto.CloseLoanDTO;
-import com.project.pawnprime.model.CloseLoan;
 import com.project.pawnprime.service.CloseLoanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +15,11 @@ public class CloseLoanController {
 
     @PostMapping
     public ResponseEntity<CloseLoanDTO> closeLoan(@RequestBody CloseLoanDTO closeLoanDTO) {
-        CloseLoanDTO responseDTO = closeLoanService.closeLoan(closeLoanDTO);
-        return ResponseEntity.ok(responseDTO);
+        try {
+            CloseLoanDTO responseDTO = closeLoanService.closeLoan(closeLoanDTO);
+            return ResponseEntity.ok(responseDTO);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new CloseLoanDTO());
+        }
     }
-
 }

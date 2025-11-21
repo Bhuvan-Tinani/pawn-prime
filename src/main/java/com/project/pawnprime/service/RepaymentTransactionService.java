@@ -61,5 +61,4 @@ public class RepaymentTransactionService {
     public List<RepaymentTransaction> getRepaymentsByAgent(Long agentId) {
         return repaymentRepo.findByAgentId(agentId);
     }
-
 }
