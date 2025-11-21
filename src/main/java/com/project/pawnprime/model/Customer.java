@@ -87,4 +87,9 @@ public class Customer {
 
     public String getAadharUrl() { return aadharUrl; }
     public void setAadharUrl(String aadharUrl) { this.aadharUrl = aadharUrl; }
+
+	public String getName() {
+		// TODO Auto-generated method stub
+		return firstName;
+	}
 }
