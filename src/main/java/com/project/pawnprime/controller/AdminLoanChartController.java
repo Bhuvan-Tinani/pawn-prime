@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+
 @RestController
 @RequestMapping("/api/admin")
 @CrossOrigin(origins = "http://localhost:3000")
@@ -74,11 +75,27 @@ public class AdminLoanChartController {
 				})
 					.sorted(Comparator.comparingLong((Map<String, Object> m) -> ((Number) m.get("value")).longValue()).reversed())
 				.collect(Collectors.toList());
+	    
+        // 🔹 NEW: total loan amount per agent
+        List<Map<String, Object>> byAgentAmount = buildByAgentAmount(allLoans);
 
-	    response.put("byAgentCount", byAgentCount);
-	    response.put("cumulativeSeries", cumulativeSeries);
-	    response.put("byAgentApproved", byAgentApproved);
-	    return response;
+        // 🔹 NEW: loan status distribution
+        List<Map<String, Object>> byStatus = buildByStatus(allLoans);
+
+        // 🔹 NEW: monthly disbursed vs repaid
+        List<Map<String, Object>> monthlyCashflow = buildMonthlyCashflow(allLoans);
+        
+        
+        response.put("byAgentCount", byAgentCount);
+        response.put("cumulativeSeries", cumulativeSeries);
+        response.put("byAgentApproved", byAgentApproved);
+
+        // 🔹 NEW fields added to API response
+        response.put("byAgentAmount", byAgentAmount);
+        response.put("byStatus", byStatus);
+        response.put("monthlyCashflow", monthlyCashflow);
+
+        return response;
 	}
 
 	private List<Map<String, Object>> buildCumulativeSeries(List<Loan> allLoans) {
@@ -107,7 +124,7 @@ public class AdminLoanChartController {
 					repaymentsByLoanId.merge(txn.getLoan().getId(), txn.getAmount(), Double::sum)
 				);
 		}
-
+		
 		// We no longer rely on any date/time field; simply order by loan id (if present)
 		List<Loan> sorted = allLoans.stream()
 				.sorted(Comparator.comparing(l -> Optional.ofNullable(l.getId()).orElse(Long.MAX_VALUE)))
@@ -134,4 +151,114 @@ public class AdminLoanChartController {
 
 		return result;
 	}
+    // 🔹 NEW: total loan amount per agent
+    private List<Map<String, Object>> buildByAgentAmount(List<Loan> allLoans) {
+        return allLoans.stream()
+                .collect(Collectors.groupingBy(
+                        loan -> loan.getAgent() != null ? loan.getAgent().getName() : "Unknown",
+                        Collectors.summingDouble(l -> Optional.ofNullable(l.getLoanVal()).orElse(0.0))
+                ))
+                .entrySet().stream()
+                .map(e -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("name", e.getKey());
+                    map.put("value", e.getValue()); // total amount
+                    return map;
+                })
+                .sorted(Comparator.comparingDouble(
+                        (Map<String, Object> m) -> ((Number) m.get("value")).doubleValue()
+                ).reversed())
+                .collect(Collectors.toList());
+    }
+
+    // 🔹 NEW: loan status distribution (count + total amount)
+    private List<Map<String, Object>> buildByStatus(List<Loan> allLoans) {
+        // group by status
+        Map<String, List<Loan>> byStatus = allLoans.stream()
+                .collect(Collectors.groupingBy(loan -> {
+                    String status = loan.getLoanStatus();
+                    return (status != null && !status.isBlank()) ? status.toUpperCase() : "UNKNOWN";
+                }));
+
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (Map.Entry<String, List<Loan>> entry : byStatus.entrySet()) {
+            String status = entry.getKey();
+            List<Loan> loans = entry.getValue();
+
+            long count = loans.size();
+            double amount = loans.stream()
+                    .map(l -> Optional.ofNullable(l.getLoanVal()).orElse(0.0))
+                    .mapToDouble(Double::doubleValue)
+                    .sum();
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("status", status);
+            map.put("count", count);
+            map.put("amount", amount);
+            result.add(map);
+        }
+
+        // sort by count descending
+        result.sort(Comparator.comparingLong(
+                (Map<String, Object> m) -> ((Number) m.get("count")).longValue()
+        ).reversed());
+
+        return result;
+    }
+
+    // 🔹 NEW: monthly disbursed (loans) vs repaid (offline + online)
+    private List<Map<String, Object>> buildMonthlyCashflow(List<Loan> allLoans) {
+        Map<String, Double> disbursedMap = new HashMap<>();
+        Map<String, Double> repaidMap = new HashMap<>();
+
+        // --- Disbursed per month (from Loan.date) ---
+        for (Loan loan : allLoans) {
+            if (loan.getDate() == null || loan.getLoanVal() == null || loan.getLoanStatus().equals("T_DONE") ) continue;
+            String period = loan.getDate().toString().substring(0, 7); // "YYYY-MM"
+            disbursedMap.merge(period, loan.getLoanVal(), Double::sum);
+        }
+
+        // --- Offline repayments per month ---
+        List<RepaymentTransaction> offlineRepayments = repaymentTransactionService.getAllRepayments();
+        if (offlineRepayments != null) {
+            for (RepaymentTransaction txn : offlineRepayments) {
+                if (txn == null || txn.getPaidDate() == null || txn.getTotalAmt() == null) continue;
+                String period = txn.getPaidDate().toLocalDate().toString().substring(0, 7);
+                repaidMap.merge(period, txn.getTotalAmt(), Double::sum);
+            }
+        }
+
+        // --- Online repayments per month (success only, service already filters) ---
+        List<OnlineRepaymentTransaction> onlineRepayments = onlineRepaymentService.getAllRepayments();
+        if (onlineRepayments != null) {
+            for (OnlineRepaymentTransaction txn : onlineRepayments) {
+                if (txn == null || txn.getCreatedAt() == null || txn.getAmount() == null) continue;
+                String period = txn.getCreatedAt().toLocalDate().toString().substring(0, 7);
+                repaidMap.merge(period, txn.getAmount(), Double::sum);
+            }
+        }
+
+        // --- Merge all periods and build sorted list ---
+        // use sorted set for chronological order
+        java.util.Set<String> allPeriods = new java.util.TreeSet<>();
+        allPeriods.addAll(disbursedMap.keySet());
+        allPeriods.addAll(repaidMap.keySet());
+
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (String period : allPeriods) {
+            double disbursed = disbursedMap.getOrDefault(period, 0.0);
+            double repaid = repaidMap.getOrDefault(period, 0.0);
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("period", period);        // "YYYY-MM"
+            map.put("disbursed", disbursed);  // total loans started in that month
+            map.put("repaid", repaid);        // offline + online
+            result.add(map);
+        }
+
+        return result;
+    }
+
+    
 }
