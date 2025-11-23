@@ -1,5 +1,6 @@
 package com.project.pawnprime.controller;
 
+import com.project.pawnprime.dto.LoanStatusDTO;
 import com.project.pawnprime.dto.loanDTO.LoanCalcRequest;
 import com.project.pawnprime.dto.loanDTO.LoanCalcResponse;
 import com.project.pawnprime.dto.loanDTO.LoanDTO;
@@ -11,6 +12,7 @@ import com.project.pawnprime.model.Agent;
 import com.project.pawnprime.model.Loan;
 import com.project.pawnprime.service.AgentService;
 import com.project.pawnprime.service.LoanService;
+import com.project.pawnprime.service.LoanStatusService;
 import com.project.pawnprime.service.RepaymentTransactionService;
 
 import org.springframework.http.HttpHeaders;
@@ -60,12 +62,15 @@ public class LoanController {
     private final LoanService loanService;
     private final AgentService agentService;
     private final RepaymentTransactionService repaymentTransService;
+    private final LoanStatusService loanStatusService;
 
     public LoanController(LoanService loanService, AgentService agentService,
-            RepaymentTransactionService repaymentTransService) {
+            RepaymentTransactionService repaymentTransService,
+            LoanStatusService loanStatusService) {
         this.loanService = loanService;
         this.agentService = agentService;
         this.repaymentTransService = repaymentTransService;
+        this.loanStatusService=loanStatusService;
     }
 
     // Create loan for a customer
@@ -508,5 +513,11 @@ public class LoanController {
         cell.setBorder(new SolidBorder(0.5f));
         cell.setBackgroundColor(bgColor);
         table.addCell(cell);
+    }
+    
+    @GetMapping("/{loanId}/status")
+    public ResponseEntity<LoanStatusDTO> getLoanStatus(@PathVariable Long loanId) {
+        LoanStatusDTO status = loanStatusService.getLoanStatus(loanId);
+        return ResponseEntity.ok(status);
     }
 }

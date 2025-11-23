@@ -81,4 +81,29 @@ public class ReceiptController {
                 .headers(headers)
                 .body(outputStream.toByteArray());
     }
+    
+    @GetMapping(
+            value = "/repayment/{loanId}/installment/{installmentNo}",
+            produces = MediaType.APPLICATION_PDF_VALUE
+    )
+    public ResponseEntity<byte[]> getRepaymentReceiptForInstallment(
+            @PathVariable Long loanId,
+            @PathVariable int installmentNo
+    ) throws IOException {
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        receiptService.exportRepaymentReceiptForInstallment(loanId, installmentNo, outputStream);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData(
+                "attachment",
+                "repayment_" + loanId + "_installment_" + installmentNo + ".pdf"
+        );
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(outputStream.toByteArray());
+    }
+
 }

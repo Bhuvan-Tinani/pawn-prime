@@ -28,7 +28,9 @@ public class RepaymentTransactionService {
                 .orElseThrow(() -> new RuntimeException("Loan not found"));
 
         Agent agent = null;
-        if (dto.getType() == PaymentType.CASH && dto.getAgentId() != null) {
+        System.out.println(dto.getAgentId());
+        if (dto.getAgentId() != null) {
+        	
             agent = agentRepo.findById(dto.getAgentId())
                     .orElseThrow(() -> new RuntimeException("Agent not found"));
         }
@@ -61,4 +63,5 @@ public class RepaymentTransactionService {
     public List<RepaymentTransaction> getRepaymentsByAgent(Long agentId) {
         return repaymentRepo.findByAgentId(agentId);
     }
+    
 }

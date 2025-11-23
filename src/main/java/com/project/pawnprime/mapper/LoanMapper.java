@@ -86,7 +86,7 @@ public class LoanMapper {
     }
     
     public static LoanSummaryDTO toSummaryDTO(Loan loan) {
-        return new LoanSummaryDTO(loan.getId(), loan.getLoanVal());
+        return new LoanSummaryDTO(loan.getId(), loan.getLoanVal(),loan.getLoanStatus());
     }
 
     public static List<LoanSummaryDTO> toSummaryDTOList(List<Loan> loans) {
