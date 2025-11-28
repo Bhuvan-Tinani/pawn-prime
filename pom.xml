@@ -137,21 +137,27 @@
 			<artifactId>jasperreports-fonts</artifactId>
 			<version>7.0.3</version>
 		</dependency>
-		
+
 		<dependency>
-   		     	 <groupId>com.itextpdf</groupId>
-   			 	<artifactId>itext7-core</artifactId>
-    			<version>8.0.5</version>
-   				<type>pom</type>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>itext7-core</artifactId>
+			<version>8.0.5</version>
+			<type>pom</type>
 		</dependency>
-		
-		
+
 
 		<dependency>
 			<groupId>net.sf.jasperreports</groupId>
 			<artifactId>jasperreports-metadata</artifactId>
 			<version>7.0.3</version>
 		</dependency>
+
+		<dependency>
+			<groupId>io.github.cdimascio</groupId>
+			<artifactId>dotenv-java</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+
 
 	</dependencies>
 
